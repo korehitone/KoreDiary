@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.KoreDiary" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.SplashScreen.App" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#121212</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app_icon</item>
+        // memanggil icon
+        <item name="postSplashScreenTheme">@style/Theme.KoreDiary</item>
+        // memanggil tema di atas setelah splash screen
+    </style>
+
+</resources>
