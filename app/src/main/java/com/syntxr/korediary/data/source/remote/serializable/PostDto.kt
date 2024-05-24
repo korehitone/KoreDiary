@@ -12,6 +12,7 @@ data class PostDto(
     @SerialName("title") val title: String,
     @SerialName("value") val value: String,
     @SerialName("mood") val mood: String,
+    @SerialName("published") val published : Boolean = false,
     @SerialName("created_at") val createdAt: String
 )
 {

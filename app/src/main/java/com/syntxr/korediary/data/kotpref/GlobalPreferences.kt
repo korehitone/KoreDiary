@@ -7,10 +7,12 @@ import com.syntxr.korediary.R
 
 object GlobalPreferences : KotprefModel() {
     var theme by enumOrdinalPref(AppTheme.DEFAULT_DARK)
+    var isOnBoarding by booleanPref(true)
 
     override fun clear() {
         super.clear()
         theme = AppTheme.DEFAULT_DARK
+        isOnBoarding = true
     }
 
     enum class AppTheme(
@@ -40,6 +42,10 @@ object GlobalPreferences : KotprefModel() {
         SAKURA_DARK(
             "Sakura - Dark",
             R.drawable.sakura_night
+        ),
+        DYNAMIC(
+            "dynamic",
+            R.drawable.forest
         )
     }
 }

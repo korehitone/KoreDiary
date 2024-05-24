@@ -16,8 +16,8 @@ android {
         applicationId = "com.syntxr.korediary"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.2"
 
         val properties = readProperties(project.rootProject.file("local.properties"))
 
@@ -143,4 +143,14 @@ dependencies {
 
 //    notification
     implementation("io.karn:notify:1.4.0")
+
+//    lottie
+    implementation("com.airbnb.android:lottie-compose:6.4.0")
+
+//    refreshable
+    implementation("com.github.fengdai.compose:pulltorefresh:0.2.0")
+
+//    screenshot
+    implementation ("com.github.SmartToolFactory:Compose-Screenshot:1.0.3")
+    implementation ("dev.shreyaspatil:capturable:2.1.0")
 }

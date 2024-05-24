@@ -13,10 +13,17 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val userUC =  globalUseCase.authUseCase
+    private val diaryUC = globalUseCase.diaryUseCase
 
     fun update(name: String, email: String, password: String){
         viewModelScope.launch {
             userUC.update(name, email, password)
+        }
+    }
+
+    fun clear () {
+        viewModelScope.launch {
+            diaryUC.deleteFavoriteAll()
         }
     }
 

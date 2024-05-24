@@ -3,11 +3,18 @@ package com.syntxr.korediary.utils
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.util.Patterns
+import androidx.core.content.FileProvider
 import androidx.work.Data
+import com.syntxr.korediary.BuildConfig
 import com.syntxr.korediary.data.source.remote.serializable.PostDto
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -49,6 +56,7 @@ fun PostDto.toDataWorker() = Data.Builder()
     .putString(KEY_TITLE, this.title)
     .putString(KEY_VALUE, this.value)
     .putString(KEY_MOOD, this.mood)
+    .putBoolean(KEY_PUBLISH, this.published)
     .putString(KEY_DATE, this.createdAt)
     .build()
 
@@ -91,5 +99,17 @@ object Network {
     fun checkConnectivity(context : Context):Boolean{
         val status = connectivityStatusString(context)
         return status == NETWORK_STATUS_WIFI || status == NETWORK_STATUS_MOBILE
+    }
+
+    fun bitmap2Uri(context: Context, bitmap: Bitmap): Uri {
+        val tempFile = File.createTempFile("tempshareimg", ".jpeg")
+        val bytes = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val bitmapData = bytes.toByteArray()
+        val fileOutput = FileOutputStream(tempFile)
+        fileOutput.write(bitmapData)
+        fileOutput.flush()
+        fileOutput.close()
+        return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", tempFile)
     }
 }

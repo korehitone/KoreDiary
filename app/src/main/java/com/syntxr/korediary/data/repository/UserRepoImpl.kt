@@ -51,6 +51,7 @@ class UserRepoImpl @Inject constructor(
                         put("username", username)
                     }
                 }
+                Toast.makeText(context, "Success register", Toast.LENGTH_SHORT).show()
                 emit(ResponseState.Success(true)) // status success
             } catch (e: Exception) { // catch error
                 emit(ResponseState.Error(e.message.toString())) // status error
@@ -79,6 +80,7 @@ class UserRepoImpl @Inject constructor(
                     this.email = email
                     this.password = password
                 }
+                Toast.makeText(context, "Success login", Toast.LENGTH_SHORT).show()
                 emit(ResponseState.Success(true)) // success
             } catch (e: Exception) {
                 emit(ResponseState.Error(e.message.toString())) // error

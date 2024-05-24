@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AppRegistration
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.LockOpen
@@ -47,14 +49,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.syntxr.korediary.R
 import com.syntxr.korediary.presentation.destinations.LoginScreenDestination
 import com.syntxr.korediary.presentation.destinations.RegisterScreenDestination
 import com.syntxr.korediary.utils.isValidEmail
 import com.syntxr.korediary.utils.meetsRequirements
 
 
+@Suppress("DEPRECATION")
 @Destination
 @Composable
 fun RegisterScreen(
@@ -64,6 +73,17 @@ fun RegisterScreen(
 
     val snackBarHostState = SnackbarHostState()
     val context = LocalContext.current
+
+    val lottie by rememberLottieComposition(
+        spec =
+        LottieCompositionSpec.RawRes(R.raw.reister_lottie)
+    )
+
+    val lottieProgress by animateLottieCompositionAsState(
+        composition = lottie,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true
+    )
 
     val email = viewModel.email.collectAsState(initial = "")
     // email yang masih kosong untuk di set ke input ext
@@ -99,7 +119,12 @@ fun RegisterScreen(
             verticalArrangement = Arrangement.Center, // ke tengah secara vertical
             horizontalAlignment = Alignment.CenterHorizontally // ke tengah secaa horizontal
         ) {
-            Spacer(modifier = Modifier.height(64.dp)) // jarak dengan tinggi
+            Icon(
+                imageVector = Icons.Rounded.AppRegistration,
+                contentDescription = null,
+                modifier =  Modifier.size(86.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp)) // jarak dengan tinggi
             Text(
                 text = "Register",
                 style = MaterialTheme.typography.titleLarge,
@@ -240,10 +265,11 @@ fun RegisterScreen(
                 onClick = {
                     if (email.value.isNotEmpty() && password.value.isNotEmpty() && username.value.isNotEmpty()) {
                         viewModel.register()
-                } else if (username.value.isNotEmpty()){
-                    isNameError = true
+                    } else if (username.value.isNotEmpty()) {
+                        isNameError = true
                     } else {
-                        Toast.makeText(context, "Make sure you fill all field", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Make sure you fill all field", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 },
                 enabled = !registerState.value.isLoading(),
@@ -268,7 +294,7 @@ fun RegisterScreen(
                         launchSingleTop = true
                     }
                 },
-                onError = { message->
+                onError = { message ->
                     Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
                 },
                 onLoading = {}

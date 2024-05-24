@@ -10,10 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface DiaryDao {
 
-    @Upsert
-    suspend fun upsert(posts: List<PostEntity>)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insert(postEntity: PostEntity)
 
     @Query("SELECT * FROM post")
@@ -24,7 +21,4 @@ interface DiaryDao {
 
     @Query("DELETE FROM post WHERE uuid = :uuid")
     suspend fun delete(uuid: String)
-
-    @Query("SELECT * FROM post WHERE title LIKE '%'||:search||'%'")
-    fun search(search: String) : Flow<List<PostEntity>>
 }

@@ -7,4 +7,12 @@ object LocalUser : KotprefModel() {
     var username by stringPref("")
     var email by stringPref("")
     var password by stringPref("")
+
+    override fun clear() {
+        super.clear()
+       uuid= ""
+        username =""
+        email = ""
+        password = ""
+    }
 }

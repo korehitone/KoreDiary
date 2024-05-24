@@ -10,10 +10,10 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.syntxr.korediary.data.source.local.DiaryDatabase
 import com.syntxr.korediary.data.source.remote.serializable.PostDto
 import com.syntxr.korediary.utils.KEY_DATE
 import com.syntxr.korediary.utils.KEY_MOOD
+import com.syntxr.korediary.utils.KEY_PUBLISH
 import com.syntxr.korediary.utils.KEY_TITLE
 import com.syntxr.korediary.utils.KEY_TITLE_NOTIFY
 import com.syntxr.korediary.utils.KEY_TXT_NOTIFY
@@ -33,7 +33,6 @@ class InsertDataWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted params: WorkerParameters,
     private val client: SupabaseClient, // karena membutuhkan supabase, kita inject saja
-    private val db: DiaryDatabase // karena membutuhkan local database, maka di-inject
 ) : CoroutineWorker(appContext, params) {
 
     private val workManager = WorkManager.getInstance(appContext) //deklarasi work manager agar bisa menggunakan noticifation worker
@@ -53,6 +52,7 @@ class InsertDataWorker @AssistedInject constructor(
                 value = inputData.getString(KEY_VALUE).toString(),
                 mood = inputData.getString(KEY_MOOD).toString(),
                 title = inputData.getString(KEY_TITLE).toString(),
+                published = inputData.getBoolean(KEY_PUBLISH, true),
                 createdAt = inputData.getString(KEY_DATE).toString()
             )
 
@@ -81,9 +81,6 @@ class InsertDataWorker @AssistedInject constructor(
                 }
             } catch (e : Exception){ //catch
                 if (runAttemptCount >= 5) { // kalo worker ini dijalankan sampai atau lebih dari lima kali
-                    db.dao.insert(postDto.toPostEntity()) // insert ke local
-                    // karena insert menggunakan entity, maka menggunakan ekstensi toPostEntity()
-
                     notifyBuilder.setInputData(
                         Data.Builder()
                             .putString(KEY_TITLE_NOTIFY, "Insert Post")

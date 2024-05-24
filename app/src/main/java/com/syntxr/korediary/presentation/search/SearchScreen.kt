@@ -6,14 +6,19 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,16 +34,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.syntxr.korediary.R
 import com.syntxr.korediary.presentation.create.EditorScreenNavArgs
 import com.syntxr.korediary.presentation.destinations.EditorScreenDestination
 import com.syntxr.korediary.presentation.home.component.PostItem
 import com.syntxr.korediary.utils.formatToString
 import com.syntxr.korediary.utils.parseToDate
 
+@Suppress("DEPRECATION")
 @Destination
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -51,6 +64,16 @@ fun SearchScreen(
     val lazyState = rememberLazyListState() // state untuk lazy column
     val flingBehavior = rememberSnapFlingBehavior(lazyListState = lazyState)
     // animasi untuk lazy column, membutuhkan state
+
+    val lottie by rememberLottieComposition(spec =
+    LottieCompositionSpec.RawRes( R.raw.search_lottie )
+    )
+
+    val lottieProgress by animateLottieCompositionAsState(
+        composition = lottie,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true
+    )
 
     var queryState by remember {
         mutableStateOf("")
@@ -88,6 +111,8 @@ fun SearchScreen(
                 onActiveChange = { // perubahan kondisi
                     activeState = it
                 },
+                placeholder = { Text(text = "Search here")},
+                leadingIcon = { Icon(imageVector = Icons.Rounded.Search, contentDescription = null)},
                 trailingIcon = {
                     if (activeState) { // ketika kondisi true atau aktif
                         IconButton(onClick = {
@@ -104,11 +129,18 @@ fun SearchScreen(
                             )
                         }
                     }
-                }
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 state.DisplayResult(
                     onIdle = { // kalau tidak sedang melakukan apapun
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            LottieAnimation(
+                                composition = lottie,
+                                progress = lottieProgress,
+                                modifier = Modifier.size(46.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "Search Something here  ♪(´▽｀)",
                             )
@@ -163,6 +195,17 @@ fun SearchScreen(
                     onError = { message ->
                         Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
                     }
+                )
+            }
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                LottieAnimation(
+                    composition = lottie,
+                    progress = lottieProgress,
+                    modifier = Modifier.size(86.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Search Something here  ♪(´▽｀)",
                 )
             }
         }

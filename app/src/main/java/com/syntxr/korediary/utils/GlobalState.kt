@@ -11,4 +11,5 @@ object GlobalState {
     var username by mutableStateOf(LocalUser.username)
     var email by mutableStateOf(LocalUser.email)
     var password by mutableStateOf(LocalUser.password)
+    var isOnBoarding by mutableStateOf(GlobalPreferences.isOnBoarding)
 }

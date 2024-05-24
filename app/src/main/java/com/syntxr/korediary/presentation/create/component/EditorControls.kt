@@ -40,7 +40,6 @@ import com.canopas.editor.ui.utils.TextSpanStyle
 @Composable
 fun StyleContainer(
     state: RichEditorState, // memerlukan RichEditorState dari library RichEditor
-    onSave : () -> Unit // ketika save data
 ) {
     Row(
         Modifier
@@ -68,18 +67,6 @@ fun StyleContainer(
             style = TextSpanStyle.UnderlineStyle,
             value = state,
         )
-
-        IconButton(
-            modifier = Modifier
-                .padding(2.dp)
-                .size(48.dp),
-            onClick = onSave,
-        ) {
-            Icon(
-                Icons.Rounded.Check, contentDescription = null,
-                modifier = Modifier.size(24.dp)
-            )
-        }
 
     }
 }

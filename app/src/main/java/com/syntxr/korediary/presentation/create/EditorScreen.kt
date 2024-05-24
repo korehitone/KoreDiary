@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +47,8 @@ import com.syntxr.korediary.presentation.create.component.StyleContainer
 import com.syntxr.korediary.presentation.destinations.EmojiPickerBottomSheetDestination
 import java.util.UUID
 
-data class EditorScreenNavArgs( // agar bisa menerima kiriman data
+data class EditorScreenNavArgs(
+    // agar bisa menerima kiriman data
     val isEdit: Boolean,
     val uuid: String,
     val title: String,
@@ -102,13 +104,22 @@ fun EditorScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            
-            IconButton(
-                onClick = { navigator.navigateUp() /* kembali ke halaman sebelumnya */ },
-                modifier = Modifier.align(Alignment.Start)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
+                IconButton(
+                    onClick = { navigator.navigateUp() /* kembali ke halaman sebelumnya */ },
+                ) {
+                    Icon(imageVector = Icons.Rounded.ArrowBackIosNew, contentDescription = null)
+                }
+
+                IconButton(onClick = { showSaveDialog = true }) {
+                    Icon(imageVector = Icons.Rounded.Check, contentDescription = null)
+                }
             }
+
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -141,9 +152,6 @@ fun EditorScreen(
 
             StyleContainer(
                 state = newState,
-                onSave = {
-                    showSaveDialog = true
-                }
             )
             RichEditor(
                 state = newState,
@@ -159,7 +167,32 @@ fun EditorScreen(
 
             AnimatedVisibility(visible = showSaveDialog) {
                 SaveDialog(
-                    onDismissRequest = { showSaveDialog = false },
+                    onDismissRequest = {
+                        val postDto = PostDto(
+                            createdAt = "now()",
+                            uuid = "${LocalUser.username}-${UUID.randomUUID() /* memakai uuid agar safe, karena uuid tidak mudah ditebak*/}",
+                            userId = LocalUser.uuid,
+                            title = titleState,
+                            value = newState.output(),
+                            mood = selectedEmoji,
+                            published = false
+                        )
+                        if (titleState.isNotEmpty() && newState.output()
+                                .isNotEmpty() && selectedEmoji.isNotEmpty()
+                        ) {
+                            if (!viewModel.isEditorHandle) {
+                                viewModel.saveDraft(postDto)
+                            }
+                            showSaveDialog = false
+                            navigator.navigateUp()
+                        } else {
+                            Toast.makeText(context, "These blank `(*>﹏<*)′", Toast.LENGTH_SHORT)
+                                .show()
+                            showSaveDialog = false
+                        }
+
+                        showSaveDialog = false
+                    },
                     onConfirmation = {
                         val postDto = PostDto(
                             createdAt = "now()",
@@ -167,9 +200,12 @@ fun EditorScreen(
                             userId = LocalUser.uuid,
                             title = titleState,
                             value = newState.output(),
-                            mood = selectedEmoji
+                            mood = selectedEmoji,
+                            published = true
                         )
-                        if (titleState.isNotEmpty() && newState.output().isNotEmpty() && selectedEmoji.isNotEmpty()){
+                        if (titleState.isNotEmpty() && newState.output()
+                                .isNotEmpty() && selectedEmoji.isNotEmpty()
+                        ) {
                             if (viewModel.isEditorHandle) {
                                 viewModel.updateCloud(titleState, newState.output(), selectedEmoji)
                             } else {
@@ -177,8 +213,9 @@ fun EditorScreen(
                             }
                             showSaveDialog = false
                             navigator.navigateUp()
-                        }else{
-                            Toast.makeText(context, "These blank `(*>﹏<*)′", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "These blank `(*>﹏<*)′", Toast.LENGTH_SHORT)
+                                .show()
                             showSaveDialog = false
                         }
                     }
@@ -193,7 +230,7 @@ fun EditorScreen(
 fun SaveDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
-    text : String  = "do you want to do this action?"
+    text: String = "do you want to do this action?",
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,

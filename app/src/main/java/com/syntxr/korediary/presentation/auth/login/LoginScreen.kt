@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -46,14 +47,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.syntxr.korediary.R
 import com.syntxr.korediary.presentation.destinations.HomeScreenDestination
 import com.syntxr.korediary.presentation.destinations.LoginScreenDestination
 import com.syntxr.korediary.presentation.destinations.RegisterScreenDestination
 import com.syntxr.korediary.utils.isValidEmail
 import com.syntxr.korediary.utils.meetsRequirements
 
+@Suppress("DEPRECATION")
 @Destination
 @Composable
 fun LoginScreen(
@@ -61,7 +69,17 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
 
-    val snackBarHostState = SnackbarHostState() // state snackbar
+    val snackBarHostState = SnackbarHostState() // state
+
+    val lottie by rememberLottieComposition(spec =
+    LottieCompositionSpec.RawRes( R.raw.login_lottie )
+    )
+
+    val lottieProgress by animateLottieCompositionAsState(
+        composition = lottie,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true
+    )
 
     val email = viewModel.email.collectAsState(initial = "") // mendapatkan value email view model
     val password = viewModel.password.collectAsState("") // value password dari viewmodel
@@ -87,7 +105,12 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(64.dp))
+            LottieAnimation(
+                composition = lottie,
+                progress = lottieProgress,
+                modifier = Modifier.size(86.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Login",
                 style = MaterialTheme.typography.titleLarge,

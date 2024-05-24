@@ -41,6 +41,12 @@ class EditorViewModel @Inject constructor(
         }
     }
 
+    fun saveDraft(postDto: PostDto){
+        viewModelScope.launch {
+            diaryUC.insertDraft(postDto)
+        }
+    }
+
     fun updateCloud(title: String, value: String, mood: String) {
         viewModelScope.launch {
             diaryUC.updateDiary(uuidHandle, title, value, mood)

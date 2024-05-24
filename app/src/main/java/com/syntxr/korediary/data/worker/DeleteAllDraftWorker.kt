@@ -10,10 +10,10 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.syntxr.korediary.domain.model.Post
+import com.syntxr.korediary.data.kotpref.LocalUser
+import com.syntxr.korediary.data.source.remote.serializable.PostDto
 import com.syntxr.korediary.utils.KEY_TITLE_NOTIFY
 import com.syntxr.korediary.utils.KEY_TXT_NOTIFY
-import com.syntxr.korediary.utils.KEY_UUID
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.github.jan.supabase.SupabaseClient
@@ -23,11 +23,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @HiltWorker
-class DeleteDataWorker @AssistedInject constructor(
+class DeleteAllDraftWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val client: SupabaseClient,
-) : CoroutineWorker(appContext, params){
+) : CoroutineWorker(appContext, params) {
 
     private val workManager = WorkManager.getInstance(appContext)
     private val constraint = Constraints.Builder()
@@ -35,23 +35,21 @@ class DeleteDataWorker @AssistedInject constructor(
     private val notifyBuilder = OneTimeWorkRequestBuilder<NotificationWorker>()
 
     override suspend fun doWork(): Result {
-        return withContext(Dispatchers.IO){
-            val uuid = inputData.getString(KEY_UUID).toString()
+        return withContext(Dispatchers.IO) {
+            val uuid = LocalUser.uuid
             return@withContext try {
-
-                delay(3000)
-
+                delay(2000)
                 client.from("posts").delete {
                     filter {
-                        Post::uuid eq uuid
-                    // memeriksa apakah ada  post dengan uuid yang sesuai
+                        PostDto::userId eq uuid
+                        PostDto::published eq false
                     }
                 }
 
                 notifyBuilder.setInputData(
                     Data.Builder()
-                        .putString(KEY_TITLE_NOTIFY, "Delete Post")
-                        .putString(KEY_TXT_NOTIFY, "Successfully delete your post").build()
+                        .putString(KEY_TITLE_NOTIFY, "Delete All Draft")
+                        .putString(KEY_TXT_NOTIFY, "Successfully delete all your draft").build()
                 )
                 notifyBuilder.setConstraints(constraint.build())
                 Result.success().apply {
@@ -61,12 +59,12 @@ class DeleteDataWorker @AssistedInject constructor(
                         notifyBuilder.build()
                     )
                 }
-            } catch (e : Exception){
+            }catch (e: Exception) {
                 if (runAttemptCount >= 5){
                     notifyBuilder.setInputData(
                         Data.Builder()
-                            .putString(KEY_TITLE_NOTIFY, "Delete Post")
-                            .putString(KEY_TXT_NOTIFY, "Failed delete your post").build()
+                            .putString(KEY_TITLE_NOTIFY, "Delete All Draft")
+                            .putString(KEY_TXT_NOTIFY, "Failed delete all your draft").build()
                     )
                     notifyBuilder.setConstraints(constraint.build())
                     Result.failure().apply {

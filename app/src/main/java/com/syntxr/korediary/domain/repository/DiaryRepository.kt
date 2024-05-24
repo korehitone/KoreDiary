@@ -8,21 +8,26 @@ interface DiaryRepository {
 
     suspend fun unsubscribe()
 
-    fun getLocal(): Flow<List<Post>>
+    fun favorite(): Flow<List<Post>>
+
+    suspend fun draft(): Result<Flow<List<Post>>>
 
     suspend fun fetch(): Result<Flow<List<Post>>>
-
-    fun upsert(posts : List<PostDto>)
-
     suspend fun update(uuid: String, title: String, value: String, mood: String)
+    suspend fun publish(uuid: String, publish : Boolean)
 
-    suspend fun insert(postDto: PostDto)
+    suspend fun insertPost(postDto: PostDto)
+    suspend fun insertDraft(postDto: PostDto)
+    suspend fun insertFavorite(postDto: PostDto)
 
-    suspend fun delete(uuid: String)
+    suspend fun deletePost(uuid: String)
+    suspend fun deleteFavorite(uuid: String)
 
-    fun search(query: String) : Flow<List<Post>>
+    suspend fun search(query: String): Flow<List<Post>>
 
-    suspend fun deleteAll()
+    suspend fun deleteAllPost()
 
-   fun clear()
+    suspend fun deleteAllDraft()
+
+    fun deleteFavoriteAll()
 }
